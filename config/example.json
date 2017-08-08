@@ -1,0 +1,15 @@
+{
+    "discord": {
+        "token": "",
+        "botId": ""
+    },
+    "evently": {
+        "url": "",
+        "apiKey": ""
+    },
+    "server": {
+        "port": 8001,
+        "domain": "http://localhost",
+        "webhook": "/webhook"
+    }
+}
