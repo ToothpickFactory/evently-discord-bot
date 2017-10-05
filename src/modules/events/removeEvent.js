@@ -1,5 +1,5 @@
-const rp = require('request-promise');
 const config = require('config');
+const evently = require('eventlyjs').init(config.evently);
 const getEvent = require('./getEvent');
 
 module.exports = function(message){
@@ -18,12 +18,7 @@ module.exports = function(message){
 }
 
 function removeEvent(event, message){
-    let options = {
-        method: 'DELETE',
-        uri: `${config.evently.url}/events/${event._id}`,
-        json: true
-    }
-    return rp(options)
+    return evently.events.remove(event._id)
         .then(() => {
             let channel = message.client.channels.find("id", event.secondId);
             channel.fetchMessage(event.thirdId)

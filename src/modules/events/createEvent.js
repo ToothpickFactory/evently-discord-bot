@@ -1,5 +1,5 @@
-const rp = require('request-promise');
 const config = require('config');
+const evently = require('eventlyjs').init(config.evently);
 const formatEvent = require('./formatEvent');
 const webhook = `${config.server.domain}:${config.server.port}${config.server.webhook}`;
 
@@ -8,30 +8,17 @@ module.exports = function(message){
     doEventCreate(event)
         .then(eventRes => event = eventRes)
         .then(() => message.channel.send(formatEvent(event)))
-        .then(message => setEventMessageId(event, message.id))
+        .then(message => setEventMessageId(event, message))
         .catch(err => message.author.send(err.message))
 }
 
 function doEventCreate(event){
-    let options = {
-        method: 'POST',
-        uri: `${config.evently.url}/events`,
-        body: event,
-        json: true
-    }
-    return rp(options);
+    return evently.events.create(event);
 }
 
-function setEventMessageId(event, messageId){
-    event.thirdId = messageId;
-
-    let options = {
-        method: 'PUT',
-        uri: `${config.evently.url}/events/${event._id}`,
-        body: event,
-        json: true
-    }
-    return rp(options);
+function setEventMessageId(event, message){
+    event.tags.push('message-id:' + message.id);
+    evently.events.update(event._id, event);
 }
 
 function buildEvent(message){
@@ -64,8 +51,7 @@ function cleanEvent(event, message){
         startTime: event.startTime ? convertTime(event.startTime) : null,
         slots: event.slots ? Number(event.slots) : 0,
         participants: event.participants || [],
-        clientId: config.evently.apiKey,
-        secondId: message.channel.id,
+        tags: ['channel-id:' + message.channel.id],
         webhook: webhook,
         owner: {
             id: message.author.id,

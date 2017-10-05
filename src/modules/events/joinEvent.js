@@ -1,5 +1,5 @@
-const rp = require('request-promise');
 const config = require('config');
+const evently = require('eventlyjs').init(config.evently);
 const refreshEvent = require('./refreshEvent');
 
 module.exports = function(message){
@@ -11,13 +11,7 @@ module.exports = function(message){
         name: message.author.username
     }
 
-    let options = {
-        method: 'POST',
-        uri: `${config.evently.url}/events/${eventId}/participants`,
-        body: participant,
-        json: true
-    }
-    return rp(options)
+    return evently.events.join(eventId, participant)
         .then(event => {
             let user = message.client.users.find("id", event.owner.id);
             user.send(`${participant.name} has joined event ${eventId}!`);

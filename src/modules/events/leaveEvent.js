@@ -1,5 +1,5 @@
-const rp = require('request-promise');
 const config = require('config');
+const evently = require('eventlyjs').init(config.evently);
 const refreshEvent = require('./refreshEvent');
 
 module.exports = function(message){
@@ -7,12 +7,7 @@ module.exports = function(message){
     let eventId = messageParts[1];
     let userId = message.author.id; 
 
-    let options = {
-        method: 'DELETE',
-        uri: `${config.evently.url}/events/${eventId}/participants/${userId}`,
-        json: true
-    }
-    return rp(options)
+    return evently.events.leave(eventId, userId)
         .then(event => {
             let user = message.client.users.find("id", event.owner.id);
             user.send(`${message.author.username} has left event ${eventId}!`);
