@@ -44,4 +44,4 @@ function init(){
 	client.login(config.discord.token);
 }
 
-module.exports = { init, client, test: "hi world" }
+module.exports = { init, client }

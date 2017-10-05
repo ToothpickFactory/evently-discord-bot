@@ -5,20 +5,14 @@ const webhook = `${config.server.domain}:${config.server.port}${config.server.we
 
 module.exports = function(message){
     let event = buildEvent(message);
-    doEventCreate(event)
+    evently.events.create(event)
         .then(eventRes => event = eventRes)
         .then(() => message.channel.send(formatEvent(event)))
-        .then(message => setEventMessageId(event, message))
+        .then(message => {
+            event.tags.push('message-id:' + message.id);
+            evently.events.update(event._id, event);
+        })
         .catch(err => message.author.send(err.message))
-}
-
-function doEventCreate(event){
-    return evently.events.create(event);
-}
-
-function setEventMessageId(event, message){
-    event.tags.push('message-id:' + message.id);
-    evently.events.update(event._id, event);
 }
 
 function buildEvent(message){
