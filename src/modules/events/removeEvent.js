@@ -20,8 +20,11 @@ module.exports = function(message){
 function removeEvent(event, message){
     return evently.events.remove(event._id)
         .then(() => {
-            let channel = message.client.channels.find("id", event.secondId);
-            channel.fetchMessage(event.thirdId)
+            let channelId = event.tags.find(tag => tag.includes("channel-id")).replace("channel-id:", "");
+            let messageId = event.tags.find(tag => tag.includes("message-id")).replace("message-id:", "");
+            let channel = message.client.channels.find("id", channelId);
+            
+            channel.fetchMessage(messageId)
                 .then(message => message.delete())
                 .catch(console.error);
         })
